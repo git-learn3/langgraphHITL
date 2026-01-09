@@ -1,14 +1,3 @@
-# from langchain.tools import tool
-
-# @tool
-# def validate_product(product_name: str) -> str:
-#     """
-#     Validate whether the product exists.
-#     Returns 'valid' or 'invalid'.
-#     """
-#     if product_name.lower() in ["iphone", "laptop"]:
-#         return "valid"
-#     return "invalid"
 
 from langgraph.graph import StateGraph
 from state.state import OrderState
@@ -50,28 +39,6 @@ b = StateGraph(OrderState)
 b.add_node("run", size_tool_fn)
 b.set_entry_point("run")
 size_tool = b.compile()
-
-
-# ---------------- Quantity tool ----------------
-# """
-# quantity_tool:
-# Ask quantity for the order.
-# """
-# # def quantity_tool_fn(state: OrderState):
-# #     return {
-# #         "quantity": 2,
-# #         "messages": ["Tool(quantity): 2 selected"]
-# #     }
-# def ask_quantity(state: OrderState):
-#     if not state.get("quantity"):
-#         return interrupt("Enter quantity:")
-#     return {"messages": [f"Quantity: {state['quantity']}"]}
-
-
-# b = StateGraph(OrderState)
-# b.add_node("run", ask_quantity)
-# b.set_entry_point("run")
-# quantity_tool = b.compile()
 
 
 # ---------------- Payment tool ----------------
