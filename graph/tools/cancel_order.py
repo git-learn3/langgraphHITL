@@ -9,7 +9,9 @@ from langgraph.types import interrupt
 from state.state import OrderState
 
 def get_order_id(state: OrderState):
-    return {"messages": ["Order ID verified"]}
+    return {
+        "order_id": "ORD-1234",
+        "messages": ["Order ID verified"]}
 
 def confirm_cancel(state: OrderState):
     if not state.get("confirmation"):
@@ -17,6 +19,7 @@ def confirm_cancel(state: OrderState):
     
     if state.get("confirmation").lower() == "no":
         return {
+            "order_id": "ORD-1234",
             "messages": [
                 "Order cancellation declined."
             ]
@@ -24,7 +27,9 @@ def confirm_cancel(state: OrderState):
     return {"messages": ["Cancellation confirmed"]}
 
 def cancel_order(state: OrderState):
-    return {"messages": ["Order cancelled successfully"]}
+    return {
+        "order_id": "ORD-1234",
+        "messages": ["Order cancelled successfully"]}
 
 builder = StateGraph(OrderState)
 

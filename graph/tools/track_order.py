@@ -8,10 +8,14 @@ from langgraph.graph import StateGraph
 from state.state import OrderState
 
 def get_order_id(state: OrderState):
-    return {"messages": ["Order ID received"]}
+    return {
+        "order_id": "ORD-1234",
+        "messages": ["Order ID received"]}
 
 def fetch_status(state: OrderState):
-    return {"messages": ["Order is in transit"]}
+    return {
+        "order_status":"In Transit",
+        "messages": ["Order is in transit"]}
 
 builder = StateGraph(OrderState)
 

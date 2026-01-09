@@ -5,17 +5,8 @@ from state.state import OrderState
 from graph.tools.place_order import place_order_graph
 from graph.tools.track_order import track_order_graph
 from graph.tools.cancel_order import cancel_order_graph
-import os
-from dotenv import load_dotenv
-load_dotenv(dotenv_path="/home/sigmoid/HITL/.env")
+from llm.groq import get_llm
 
-from langchain_groq import ChatGroq
-
-os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
-llm=ChatGroq(
-        model="openai/gpt-oss-120b",
-        temperature=0
-    )
 
 # Tools are defined here
 TOOLS = {
@@ -37,6 +28,7 @@ Available tools and their descriptions:
 
 Return ONLY the tool name.
 """
+    llm=get_llm()
     tool = llm.invoke(prompt).content.strip()
     return {"selected_tool": tool}
 
