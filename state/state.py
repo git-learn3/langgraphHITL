@@ -10,5 +10,7 @@ class OrderState(TypedDict):
     product_valid: bool | None
     size: str | None
     quantity: int | None
-    
+    order_id: str | None
+    order_status: str | None
+
     messages: Annotated[list[str], add_messages]
