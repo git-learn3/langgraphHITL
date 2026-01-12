@@ -7,32 +7,47 @@ from graph.tools.track_order import track_order_graph
 from graph.tools.cancel_order import cancel_order_graph
 from llm.groq import get_llm
 
+from graph.tools_llm.lc_tools import place_order, track_order, cancel_order
 
-# Tools are defined here
-TOOLS = {
-    "place_order": place_order_graph.__doc__,
-    "track_order": track_order_graph.__doc__,
-    "cancel_order": cancel_order_graph.__doc__,
-}
+llm = get_llm()
 
-# Router decides which tool to run based on input
+llm_with_tools = llm.bind_tools([
+    place_order,
+    track_order,
+    cancel_order
+])
+
 def tool_select(state: OrderState):
-    prompt = f"""
-You are an intent router.
+    response = llm_with_tools.invoke(
+        [
+            {
+                "role": "system",
+                "content": (
+                    "You are an AI router.\n"
+                    "You MUST select exactly ONE tool.\n"
+                    "Do NOT respond with text.\n"
+                    "Always call a tool."
+                )
+            },
+            {
+                "role": "user",
+                "content": state["input"]
+            }
+        ]
+    )
 
-User request:
-{state["input"]}
+    if not response.tool_calls:
+        raise RuntimeError("❌ LLM failed to select a tool")
 
-Available tools and their descriptions:
-{TOOLS}
+    tool_call = response.tool_calls[0]
 
-Return ONLY the tool name.
-"""
-    llm=get_llm()
-    tool = llm.invoke(prompt).content.strip()
-    return {"selected_tool": tool}
+    return {
+        "selected_tool": tool_call["name"],
+        "tool_args": tool_call["args"]
+    }
 
-# Build the graph
+
+#Build the graph
 builder = StateGraph(OrderState)
 
 builder.add_node("start", tool_select)

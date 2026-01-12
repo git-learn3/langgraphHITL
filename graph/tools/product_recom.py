@@ -10,7 +10,7 @@ from llm.groq import get_llm
 
 llm = get_llm()
 
-AVAILABLE_PRODUCTS = ["iphone", "laptop", "tablet"]
+AVAILABLE_PRODUCTS = ["iphone", "laptop"]
 
 
 def recommend_product(state: OrderState):
