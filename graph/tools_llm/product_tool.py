@@ -10,7 +10,7 @@ Selects a product for ordering.
 """
 def product_tool_fn(state: OrderState):
     return {
-        "product": state["product"],   # 🔑 WRITE IT BACK
+        "product": state["product"],   # WRITE IT BACK
         "messages": [
             f"Tool(product): product selected = {state['product']}"
         ]

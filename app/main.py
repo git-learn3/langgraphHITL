@@ -5,6 +5,7 @@ thread_id = "demo-1"
 
 config = {"configurable": {"thread_id": thread_id}}
 
+
 def pretty_print_result(state: dict):
     tool = state.get("selected_tool")
 
@@ -49,6 +50,8 @@ text=input("How can i help you? ")
 initial_input = {"input": text, "messages": []}
 
 result = graph.invoke(initial_input, config=config)
+print("Thread ID:", config["configurable"]["thread_id"])
+
 # print(result)
 
 # --- Step 2: HITL loop (pause/resume for human input) ---
@@ -75,6 +78,7 @@ while "__interrupt__" in result:
         state_update,
         config=config
     )
+    print("Resume Thread ID:", config["configurable"]["thread_id"])
     
 # --- Step 3: Final workflow result ---
 print(pretty_print_result(result))

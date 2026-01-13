@@ -15,13 +15,10 @@ from graph.tools_llm.product_tool import TOOLS
 from graph.tools.product_recom import product_recommendation_graph
 from graph.tools_llm.product_validate import product_validate_graph
 
-
-from llm.groq import get_llm
-
 llm = get_llm()
 
 def extract_product(state: OrderState):
-    # 🔑 DO NOT overwrite if product already exists (HITL case)
+    # DO NOT overwrite if product already exists (HITL case)
     if state.get("product"):
         return {
             "product": state["product"],   # KEEP IT EXPLICIT

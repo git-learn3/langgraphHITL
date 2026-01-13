@@ -4,6 +4,7 @@ from langgraph.graph import add_messages
 class OrderState(TypedDict):
     input: str
     selected_tool: str | None
+    tools_args: str | None
     confirmation: str | None
 
     product: str | None
