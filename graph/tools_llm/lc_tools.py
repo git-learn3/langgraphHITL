@@ -1,8 +1,9 @@
 from langchain_core.tools import tool
-from graph.tools.place_order import place_order_graph
-from graph.tools.track_order import track_order_graph
-from graph.tools.cancel_order import cancel_order_graph
-
+# from graph.tools.place_order import place_order_graph
+# from graph.tools.track_order import track_order_graph
+# from graph.tools.cancel_order import cancel_order_graph
+from graph.subgraphs import load_subgraphs
+SUBGRAPHS = load_subgraphs()
 # ---------------- PLACE ORDER TOOL ----------------
 @tool
 def place_order(input: str) -> dict:
@@ -19,7 +20,7 @@ def place_order(input: str) -> dict:
 
     Uses LangGraph with human-in-the-loop support.
     """
-    return place_order_graph.invoke(
+    return SUBGRAPHS["place_order"].invoke(
         {"input": input, "messages": []}
     )
 
@@ -30,7 +31,7 @@ def track_order(input: str) -> dict:
     """
     Tracks an existing order and returns delivery status.
     """
-    return track_order_graph.invoke(
+    return SUBGRAPHS["track_order"].invoke(
         {"input": input, "messages": []}
     )
 
@@ -41,6 +42,6 @@ def cancel_order(input: str) -> dict:
     """
     Cancels an existing order after human confirmation.
     """
-    return cancel_order_graph.invoke(
+    return SUBGRAPHS["cancel_order"].invoke(
         {"input": input, "messages": []}
     )

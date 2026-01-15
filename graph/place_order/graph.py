@@ -11,9 +11,9 @@ from state.state import OrderState
 from langgraph.types import interrupt
 from llm.groq import get_llm
 
-from graph.tools_llm.product_tool import TOOLS
-from graph.tools.product_recom import product_recommendation_graph
-from graph.tools_llm.product_validate import product_validate_graph
+from graph.place_order.tools import TOOLS
+from graph.place_order.recommenders import recommend_product
+from graph.place_order.validators import validate_product
 
 llm = get_llm()
 
@@ -35,6 +35,7 @@ Rules:
 - Do NOT explain.
 - Do NOT guess.
 - They might ask product in form of question, then also return ONLY product name
+- Handle misspellings gracefully. for example, "iphon" -> "iphone", "laptp" -> "laptop", etc.
 
 User text:
 "{state['input']}"
@@ -91,40 +92,42 @@ def place_order(state:OrderState):
         ]
     }
 
-builder = StateGraph(OrderState)
+def build_place_order_graph(CheckpointSaver=None):
+    builder = StateGraph(OrderState)
 
-#-----proiduct input analysis node-----------
-builder.add_node("extract_product", extract_product)
-builder.add_node("select_product", TOOLS["product"])
-builder.add_node("validate_product", product_validate_graph)
-builder.add_node("recommend", product_recommendation_graph)
-builder.add_node("ask_product", ask_product_again)
+    #-----proiduct input analysis node-----------
+    builder.add_node("extract_product", extract_product)
+    builder.add_node("select_product", TOOLS["product"])
+    builder.add_node("validate_product", validate_product)
+    builder.add_node("recommend", recommend_product)
+    builder.add_node("ask_product", ask_product_again)
 
-# ---------normal node----------
-builder.add_node("select_size", TOOLS["size"])
-builder.add_node("ask_quantity", ask_quantity)
-builder.add_node("confirm_order", place_order)
-builder.add_node("payment", TOOLS["payment"])
+    # ---------normal node----------
+    builder.add_node("select_size", TOOLS["size"])
+    builder.add_node("ask_quantity", ask_quantity)
+    builder.add_node("confirm_order", place_order)
+    builder.add_node("payment", TOOLS["payment"])
 
-builder.set_entry_point("extract_product")
+    builder.set_entry_point("extract_product")
 
-builder.add_edge("extract_product", "select_product")
-builder.add_edge("select_product", "validate_product")
+    builder.add_edge("extract_product", "select_product")
+    builder.add_edge("select_product", "validate_product")
 
-builder.add_conditional_edges(
-    "validate_product",
-    validation_router,
-    {
-        "valid": "select_size",
-        "invalid": "recommend",
-    }
-)
-builder.add_edge("recommend", "ask_product")
-builder.add_edge("ask_product", "select_product")
+    builder.add_conditional_edges(
+        "validate_product",
+        validation_router,
+        {
+            "valid": "select_size",
+            "invalid": "recommend",
+        }
+    )
+    builder.add_edge("recommend", "ask_product")
+    builder.add_edge("ask_product", "select_product")
 
-# ---- normal flow -------------
-builder.add_edge("select_size", "ask_quantity")
-builder.add_edge("ask_quantity", "confirm_order")
-builder.add_edge("confirm_order", "payment")
+    # ---- normal flow -------------
+    builder.add_edge("select_size", "ask_quantity")
+    builder.add_edge("ask_quantity", "confirm_order")
+    builder.add_edge("confirm_order", "payment")
 
-place_order_graph = builder.compile()
+    place_order_graph = builder.compile()
+    return place_order_graph

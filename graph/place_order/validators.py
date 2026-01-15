@@ -28,8 +28,8 @@ def validate_product(state: OrderState):
         "messages": [f"Product '{product}' available: {is_valid}"]
     }
 
-builder = StateGraph(OrderState)
-builder.add_node("validate", validate_product)
-builder.set_entry_point("validate")
+# builder = StateGraph(OrderState)
+# builder.add_node("validate", validate_product)
+# builder.set_entry_point("validate")
 
-product_validate_graph = builder.compile()
+# product_validate_graph = builder.compile()

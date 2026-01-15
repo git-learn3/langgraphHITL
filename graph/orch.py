@@ -2,9 +2,9 @@ from langgraph.graph import StateGraph
 from langgraph.types import interrupt
 from langgraph.checkpoint.memory import MemorySaver
 from state.state import OrderState
-from graph.tools.place_order import place_order_graph
-from graph.tools.track_order import track_order_graph
-from graph.tools.cancel_order import cancel_order_graph
+# from graph.tools.place_order import place_order_graph
+# from graph.tools.track_order import track_order_graph
+# from graph.tools.cancel_order import cancel_order_graph
 from llm.groq import get_llm
 
 from graph.tools_llm.lc_tools import place_order, track_order, cancel_order
@@ -16,6 +16,10 @@ llm_with_tools = llm.bind_tools([
     track_order,
     cancel_order
 ])
+from graph.subgraphs import load_subgraphs
+
+SUBGRAPHS = load_subgraphs()
+
 
 def tool_select(state: OrderState):
     response = llm_with_tools.invoke(
@@ -51,9 +55,9 @@ def tool_select(state: OrderState):
 builder = StateGraph(OrderState)
 
 builder.add_node("start", tool_select)
-builder.add_node("place_order", place_order_graph)
-builder.add_node("track_order", track_order_graph)
-builder.add_node("cancel_order", cancel_order_graph)
+builder.add_node("place_order", SUBGRAPHS["place_order"])
+builder.add_node("track_order", SUBGRAPHS["track_order"])
+builder.add_node("cancel_order", SUBGRAPHS["cancel_order"])
 
 # Conditional edges from router → tool nodes
 builder.add_conditional_edges(

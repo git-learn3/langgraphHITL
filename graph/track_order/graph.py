@@ -6,6 +6,7 @@ No human interaction required.
 """
 from langgraph.graph import StateGraph
 from state.state import OrderState
+from graph.track_order.tools import fetch_status_tool
 
 def get_order_id(state: OrderState):
     return {
@@ -17,12 +18,14 @@ def fetch_status(state: OrderState):
         "order_status":"In Transit",
         "messages": ["Order is in transit"]}
 
-builder = StateGraph(OrderState)
+def build_track_order_graph(CheckpointSaver=None):
+    builder = StateGraph(OrderState)
 
-builder.add_node("get_order_id", get_order_id)
-builder.add_node("fetch_status", fetch_status)
+    builder.add_node("get_order_id", get_order_id)
+    builder.add_node("fetch_status", fetch_status_tool)
 
-builder.set_entry_point("get_order_id")
-builder.add_edge("get_order_id", "fetch_status")
+    builder.set_entry_point("get_order_id")
+    builder.add_edge("get_order_id", "fetch_status")
 
-track_order_graph = builder.compile()
+    track_order_graph = builder.compile()
+    return track_order_graph

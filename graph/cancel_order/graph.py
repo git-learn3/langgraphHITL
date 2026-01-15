@@ -7,11 +7,12 @@ Requires order ID and human confirmation before cancellation.
 from langgraph.graph import StateGraph
 from langgraph.types import interrupt
 from state.state import OrderState
+from graph.cancel_order.tools import get_order_id_tool
 
-def get_order_id(state: OrderState):
-    return {
-        "order_id": "ORD-1234",
-        "messages": ["Order ID verified"]}
+# def get_order_id(state: OrderState):
+#     return {
+#         "order_id": "ORD-1234",
+#         "messages": ["Order ID verified"]}
 
 def confirm_cancel(state: OrderState):
     if not state.get("confirmation"):
@@ -31,15 +32,17 @@ def cancel_order(state: OrderState):
         "order_id": "ORD-1234",
         "messages": ["Order cancelled successfully"]}
 
-builder = StateGraph(OrderState)
+def build_cancel_order_graph(CheckpointSaver=None):
+    builder = StateGraph(OrderState)
 
-builder.add_node("get_order_id", get_order_id)
-builder.add_node("confirm_cancel", confirm_cancel)
-builder.add_node("cancel_order", cancel_order)
+    builder.add_node("get_order_id", get_order_id_tool)
+    builder.add_node("confirm_cancel", confirm_cancel)
+    builder.add_node("cancel_order", cancel_order)
 
-builder.set_entry_point("get_order_id")
-builder.add_edge("get_order_id", "confirm_cancel")
-builder.add_edge("confirm_cancel", "cancel_order")
+    builder.set_entry_point("get_order_id")
+    builder.add_edge("get_order_id", "confirm_cancel")
+    builder.add_edge("confirm_cancel", "cancel_order")
 
-cancel_order_graph = builder.compile()
+    cancel_order_graph = builder.compile()
+    return cancel_order_graph
 

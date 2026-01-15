@@ -1,4 +1,10 @@
 # app/main2.py
+import sys
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from graph.orch import graph
 from langgraph.types import Command
 import logging
@@ -11,6 +17,7 @@ import logging
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 
 # OPTIMIZED OUTPUT FORMATTING
 def pretty_print_result(state: dict):
@@ -196,6 +203,7 @@ def main():
             # Display results
             if result:
                 pretty_print_result(result)
+                print(result)
                 
                 # Ask if user wants to continue
                 continue_choice = input("\n🔄 Continue? (yes/no): ").strip().lower()
